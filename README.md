@@ -10,6 +10,7 @@ I needed a tool that generates a lookup table for signal words and corresponding
 
 #### Installation
 You have two options:
+<<<<<<< HEAD
 
 * Clone the entire git repository.
 
@@ -18,6 +19,10 @@ You have two options:
 * [Download](https://raw.github.com/Nepomuk/hamming-code/master/hamming_table.py) the script alone and save it to some folder on your PC.
 
         wget https://raw.github.com/Nepomuk/hamming-code/master/hamming_table.py
+=======
+* Clone the entire git repository.
+* Download the script alone and save it to some folder on your PC.
+>>>>>>> ee60b40bc0908e6df85fd943040c39c4e33d783c
 
 If you want to call the script directly, you first have to make it executable:
 
