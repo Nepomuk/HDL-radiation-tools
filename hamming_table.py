@@ -85,7 +85,7 @@ def isParityPosition(pos):
 
 # how many parity bits do we need?
 def ParityBits():
-    for m in range(2, nSignalBits):
+    for m in range(2, nSignalBits+2):
         sigLenMax = 2**m - m - 1
         if (sigLenMax >= nSignalBits):
             return m
