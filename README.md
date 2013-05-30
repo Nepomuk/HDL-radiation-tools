@@ -62,3 +62,48 @@ Printing table for Ham(7,4):
 1111   1111111
 ```
 
+
+VHDL Halo Constants
+-------------------
+
+For my development of a Hamming encoded VHDL project, I wanted to simplify the work when it came to state machines. If want to definie your own states, including valid and halo states, you end up writing a lot of zeros and ones - especially when you have lots of states. This program helps you generate the definition of these halo states (generating all the states with one bit flipped).
+
+#### Installation
+
+Same as above, except that you have to make another script executable:
+
+```bash
+chmod u+x vhdl_halo_constat.py
+```
+
+#### Usage
+
+```bash
+./vhdl_halo_constat.py <constant name> <valid signal>
+```
+
+**Parameter:**
+
+* `constant name`: A valid VHDL name for a signal/constant, for instance `IDLE`.
+* `valid signal`: The original signal for the state as a string of bits. So for instance `00111`.
+
+**Output**
+
+Running with the example values given in the parameter section, the program will print out this:
+
+```bash
+$ ./vhdl_halo_constant.py IDLE 00111
+constant IDLE_0 : state_type := "00110";
+constant IDLE_1 : state_type := "00101";
+constant IDLE_2 : state_type := "00011";
+constant IDLE_3 : state_type := "01111";
+constant IDLE_4 : state_type := "10111";
+```
+
+You can copy and paste this into your VHDL project and have all the halo states of the initial IDLE state, where just one bit is flipped.
+
+Btw: `state_type` in this example would be a subtype of a `std_logic_vector:
+
+```
+subtype state_type is std_logic_vector(4 downto 0);
+```
