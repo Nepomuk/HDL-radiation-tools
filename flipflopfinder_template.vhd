@@ -13,11 +13,10 @@
 -- end process;
 --
 -- # And finally do the SEU somewhere in your testbench:
--- sim_SEU_FF( FF_ID_to_test, SEU_err, clk, clk_period );
+-- sim_SEU_FF( FF_ID_to_test, clk, clk_period );
 --
 -- # The parameters are the following:
 -- #   FF_ID_to_test: The integer ID of the flip flop to test
--- #   SEU_err:       The SEU error flag
 -- #   clk:           The clock driving this flip flop
 -- #   clk_period:    Clock period of this clock.
 --
@@ -40,8 +39,8 @@ package $packageName is
   -- Simulate a single event upset for a flip flop
   procedure sim_SEU_FF (
     constant src : in integer range 0 to N_FLIPFLOPS-1; -- number of FF to use
-    signal   seu : in std_logic;        -- the SEU indicator from the module
-    signal   clk : in std_logic         -- clock
+    signal   clk : in std_logic;        -- clock
+    constant clk_p : in time            -- clock period
   );
 
   -- Produce the acutal glitch
@@ -60,7 +59,6 @@ package body $packageName is
   -- Simulate single event upsets for a flip flop
   procedure sim_SEU_FF (
     constant src : in integer range 0 to N_FLIPFLOPS-1; -- which FF to use?
-    signal   seu : in std_logic;      -- the SEU indicator from the module
     signal   clk : in std_logic;      -- clock
     constant clk_p : in time          -- clock period
   ) is
