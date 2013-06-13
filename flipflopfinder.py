@@ -17,20 +17,26 @@
 # ------------------------------------------------------------------------------
 
 # Import stuff
-import sys
-import time
-from os.path import basename, splitext
-from pprint import pprint
-from pyparsing import ParseException
-from verilogParse import Verilog_BNF as verilogBNF
+import sys          # system functions (like exit)
+import time         # time functions
+from os.path import basename, splitext, getsize     # some useful functions for filenames
+from pprint import pprint                           # nice print (used for debug)
+from pyparsing import ParseException                # parsing features
+from verilogParse import Verilog_BNF as verilogBNF  # verilog parser
+from Cheetah.Template import Template               # template file
 
 
-# configuration
+# verbose level
 _verbose = 1
+
+# template file as the basis for the output file
+_templateFile = "flipflopfinder_template.vhd"
+
+# which cells represent flip flops?
 _FFcells = ['DFF', 'DFFR', 'DFFS', 'DFFSR', 'SDFF', 'SDFFR', 'SDFFS', 'SDFFSR']
 
 
-# global values
+# initialize global values
 _inFile = None
 _outFile = None
 _topLevelName = ""
@@ -73,7 +79,7 @@ def parseFile():
 
     # convert text into tokens we can handle
     if _verbose > 0:
-        print "  parse the input into memory ..."
+        print "  parse the input into memory ... (might take a while)"
     startTime = time.clock()
     lines = "".join(lines)
     try:
@@ -157,44 +163,20 @@ def buildInstanceList():
 
 def saveToOutput():
     global _outFile
-    packageName = splitext(basename(_outFile.name))[0]
+    t = Template(file=_templateFile)
 
-    # file header
-    _outFile.write("-- Automatically generated VHDL file to import into testbench.\n")
-    _outFile.write("--     generated on {0}\n".format(time.strftime('%x %X %Z')))
-    _outFile.write("--\n")
-    _outFile.write("-- To use this package, simply import it into your testbench:\n")
-    _outFile.write("-- use work.{0}.all;\n".format(packageName))
-    _outFile.write("--\n")
-    _outFile.write("\n")
+    # fill the placeholders with meaning
+    t.datetime = time.strftime('%x %X %Z')
+    t.packageName = splitext(basename(_outFile.name))[0]
+    t.nFF = len(_verilogInstanceStrings)
+    t.flipflops = _verilogInstanceStrings
 
-    # VHDL header
-    _outFile.write('library ieee;\n')
-    _outFile.write('use ieee.std_logic_1164.all;\n')
-    _outFile.write('use ieee.numeric_std.all;\n')
-    _outFile.write('\n')
-    _outFile.write('package {0} is\n'.format(packageName))
-    _outFile.write('  constant N_FLIPFLOPS : integer := {0};\n'.format(len(_FF)))
-    _outFile.write('  function getFlipFlop( n : in integer ) return string;\n')
-    _outFile.write('end;\n')
-    _outFile.write('\n')
-
-    # The return function with data
-    _outFile.write('package body {0} is\n'.format(packageName))
-    _outFile.write('  function getFlipFlop( n : in integer )\n')
-    _outFile.write('  return string is\n')
-    _outFile.write('  begin\n')
-    _outFile.write('    case n is\n')
-    i = 0
-    for FF in _verilogInstanceStrings:
-        _outFile.write('      when {0} => return "{1}";\n'.format(i, FF))
-        i += 1
-    _outFile.write('      when others => return "NOT FOUND";\n')
-    _outFile.write('    end case;\n')
-    _outFile.write('  end getFlipFlop;\n')
-    _outFile.write('end package body;\n')
-
+    # write the file
+    _outFile.write(str(t))
     _outFile.close()
+
+    if _verbose > 0:
+        print "File {0} with {1} kB written.".format(_outFile.name, getsize(_outFile.name)/1024)
 
 
 # How the program is intended to use
@@ -206,6 +188,11 @@ def printUsage():
     print "  verilog_project    The path to the verilog file conaining the project after"
     print "                     synthesis."
     print "  toplevel_name      The name used in the testbench to instantiate the top level."
+    print ""
+    print "For the output a template file is needed. Currently it is set to this file:"
+    print "  '{0}'".format(_templateFile)
+    print "Make sure that it exists. If you want to change this filename, see the configuration"
+    print "section in this python script."
     sys.exit()
 
 
