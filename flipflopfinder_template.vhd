@@ -16,8 +16,9 @@
 -- sim_SEU_FF( FF_ID_to_test, clk, clk_period );
 --
 -- # The parameters are the following:
--- #   FF_ID_to_test: The integer ID of the flip flop to test
--- #   clk:           The clock driving this flip flop
+-- #   FF_ID_to_test: The integer ID of the flip flop to test.
+-- #   SEU_active:    High while the SEU is active.
+-- #   clk:           The clock driving this flip flop.
 -- #   clk_period:    Clock period of this clock.
 --
 
@@ -39,7 +40,8 @@ package $packageName is
   -- Simulate a single event upset for a flip flop
   procedure sim_SEU_FF (
     constant src : in integer range 0 to N_FLIPFLOPS-1; -- number of FF to use
-    signal   clk : in std_logic;        -- clock
+    signal   seu : out std_logic;       -- SEU active
+    signal   clk : in  std_logic;       -- clock
     constant clk_p : in time            -- clock period
   );
 
@@ -59,8 +61,9 @@ package body $packageName is
   -- Simulate single event upsets for a flip flop
   procedure sim_SEU_FF (
     constant src : in integer range 0 to N_FLIPFLOPS-1; -- which FF to use?
-    signal   clk : in std_logic;      -- clock
-    constant clk_p : in time          -- clock period
+    signal   seu : out std_logic;       -- SEU active
+    signal   clk : in  std_logic;       -- clock
+    constant clk_p : in time            -- clock period
   ) is
     variable flipped_signal : string( 1 to 3 );
   begin
