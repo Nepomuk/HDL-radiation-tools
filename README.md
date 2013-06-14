@@ -201,7 +201,7 @@ You have to make three steps. Variables starting with $ are replaced in the fina
 
         sim_SEU_FF( FF_ID_to_test, SEU_active, clk, clk_period );
 
-    The parameters are the following:
+  The parameters are the following:
 
     * `FF_ID_to_test`: The integer ID of the flip flop to test
     * `SEU_active`: A flag informing the testbench when the SEU is happening
