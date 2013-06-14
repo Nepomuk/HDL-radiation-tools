@@ -203,7 +203,7 @@ You have to make three steps. Variables starting with $ are replaced in the fina
 
   The parameters are the following:
 
-  * `FF_ID_to_test`: The integer ID of the flip flop to test
-  * `SEU_active`: A flag informing the testbench when the SEU is happening
-  * `clk`: The clock driving this flip flop
-  * `clk_period`: Clock period of this clock.
+    * `FF_ID_to_test`: The integer ID of the flip flop to test
+    * `SEU_active`: A flag informing the testbench when the SEU is happening
+    * `clk`: The clock driving this flip flop
+    * `clk_period`: Clock period of this clock.
