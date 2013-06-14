@@ -199,10 +199,11 @@ You have to make three steps. Variables starting with $ are replaced in the fina
 
 3. Create a single event upset by calling the procedure from the output file.
 
-        sim_SEU_FF( FF_ID_to_test, clk, clk_period );
+        sim_SEU_FF( FF_ID_to_test, SEU_active, clk, clk_period );
 
     The parameters are the following:
 
     * `FF_ID_to_test`: The integer ID of the flip flop to test
+    * `SEU_active`: A flag informing the testbench when the SEU is happening
     * `clk`: The clock driving this flip flop
     * `clk_period`: Clock period of this clock.
