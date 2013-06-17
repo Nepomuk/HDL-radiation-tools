@@ -170,6 +170,7 @@ def saveToOutput():
     t.packageName = splitext(basename(_outFile.name))[0]
     t.nFF = len(_verilogInstanceStrings)
     t.flipflops = _verilogInstanceStrings
+    t.flipflops_SEU = [ff[:-1] + "SEU" for ff in _verilogInstanceStrings]
 
     # write the file
     _outFile.write(str(t))
