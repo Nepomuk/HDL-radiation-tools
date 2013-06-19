@@ -9,6 +9,8 @@ Contents:
 * [VHDL Halo Constants](#vhdl-halo-constants)
 * [Flip Flop Finder](#flip-flop-finder)
 
+* auto-gen TOC:
+{:toc}
 
 Hamming Table
 -------------
@@ -134,11 +136,7 @@ If you are using another system to develop, you have to search for alternatives.
 
 It is based on this [verlog parser](https://github.com/yellekelyk/PyVerilog) by [yellekelyk](https://github.com/yellekelyk) which uses the [pyparsing](http://pyparsing.wikispaces.com/) module.
 
-Files belonging to this part:
-
-* `flipflopfinder.py`
-* `flipflopfinder_template.vhd`
-* `verilogParse.py`
+The files belonging to this part a located in the subfolder `flipflopfinder`.
 
 
 ### Installation
@@ -149,6 +147,7 @@ Basically the same as above, so you have to make another script executable:
 chmod u+x flipflopfinder.py
 ```
 
+#### Python modules
 Furthermore you might have to install some dependencies for this script. It uses several python modules, which don't come with the default installation. I recommend installing these with [easy\_install](http://pythonhosted.org/distribute/easy_install.html), because it is just very easy.
 If you don't have super user access (like in my case) you may also go with a virtual python library. The way, how to do that, is described in the [easy\_install documentation](http://pythonhosted.org/distribute/easy_install.html#custom-installation-locations).
 
@@ -163,6 +162,50 @@ wsgiref
 ```
 
 Note: If you are using python 2.x, you have to stick to the last pyparsing version prior 2.x, which would mean `easy_install pyparsing==1.5.6`.
+
+
+#### Modify standard cells
+This step is optional, but I recommend you to do it. What we will do is basically to add something to the standard cell that enables the testbench to flip the output value of a flip flop. The alternative is to change the input value of the flip flop at a rising edge of the clock, therefore overwriting the flip flops supposed value. But the input line might also be connected to another flip flop or _whatever_ logic, so for some cases you end up changing more than one flip flop at a time.
+
+First you have to locate your standard cell directory and make a local copy of it. A starting point for searching could be the `cds.lib` file for NCLaunch. In there were these lines at my setup:
+
+```
+DEFINE cmos8rf_lib /usr/ibm_lib/cmos8_relDM/ibm_cmos8rf/std_cell/relDM/verilog/cmos8rf_lib
+DEFINE worklib ./worklib
+```
+
+The directory you need to copy is then `/usr/ibm_lib/cmos8_relDM/ibm_cmos8rf/std_cell/relDM/verilog/`. After done this, locate your flip flop modules. I went with the basic modules and not with the primitives, because the latter produced some strange effects. For me I had to change the following modules:
+
+```
+DFF.v, DFFR.v, DFFS.v, DFFSR.v, SDFF.v, SDFFR.v, SDFFS.v, SDFFSR.v
+```
+
+I put my [DFFR.v](https://github.com/Nepomuk/HDL-radiation-tools/blob/master/flipflopfinder/DFFR.v) as an example in this repository and commented, what you have to change. The relevant part is this:
+
+```verilog
+reg SEU = 1'b0;
+always @(posedge CLK) begin
+  SEU <= 1'b0;
+end
+
+wire qout, qout2;
+assign qout2 = (SEU) ? ~qout : qout;
+
+DFF_ASYNR  r1 (qout,CLK,D,RN,notifier);
+buf        b0 (Q, qout2);
+not        i1 (QBAR, qout2);
+```
+
+To give some explaination for the changes: The `SEU` signal is initialized with low value and can only be changed to high by a function like `nc_force` from your testbench. It gets reset to low with the next clock cycle, because we want to accept a new value with the next rising edge.
+If `SEU` is high, it negates the `qout` signal (which is the output of the flip flop look-up table `DFF_ASYNR`) and transfers it via `qout2` to the output lines.
+
+After you have made all modifications, you need to tell your simulator where to find the modified standard cell library. For me the cds.lib looks now like this:
+
+```
+#DEFINE cmos8rf_lib /usr/ibm_lib/cmos8_relDM/ibm_cmos8rf/std_cell/relDM/verilog/cmos8rf_lib
+DEFINE cmos8rf_lib ./std_cell_SEU/verilog/cmos8rf_lib
+DEFINE worklib ./worklib
+```
 
 
 ### Usage
@@ -189,7 +232,7 @@ You have to make three steps. Variables starting with $ are replaced in the fina
 
         use work.${packageName}.all;
 
-2. Link the mirror signals to the acutal flip flop values. This is needed to determine, which value is the current one and which is the "switched value".
+2. _Optional step_: Link the mirror signals to the acutal flip flop values. If you are sticking to unchanged standard cells, this is needed to determine, which value is the current one and which is the "switched value".
 
         process begin
           for i in 0 to N_FLIPFLOPS-1 loop
@@ -199,7 +242,7 @@ You have to make three steps. Variables starting with $ are replaced in the fina
 
 3. Create a single event upset by calling the procedure from the output file.
 
-        sim_SEU_FF( FF_ID_to_test, SEU_active, clk, clk_period );
+        sim_SEU_FF( FF_ID_to_test, SEU_active, clk, clk_period, method );
 
   The parameters are the following:
 
@@ -207,3 +250,4 @@ You have to make three steps. Variables starting with $ are replaced in the fina
     * `SEU_active`: A flag informing the testbench when the SEU is happening
     * `clk`: The clock driving this flip flop
     * `clk_period`: Clock period of this clock.
+    * `method`: Select the method generating a SEU: '0' input line, '1' flip inside (modified std. cell)
