@@ -9,8 +9,6 @@ Contents:
 * [VHDL Halo Constants](#vhdl-halo-constants)
 * [Flip Flop Finder](#flip-flop-finder)
 
-* auto-gen TOC:
-{:toc}
 
 Hamming Table
 -------------
