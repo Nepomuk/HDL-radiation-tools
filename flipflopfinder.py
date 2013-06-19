@@ -147,7 +147,10 @@ def buildInstanceList():
     global _verilogInstanceStrings
     for FF in _FF:
         # basis of the string
-        verilogString = "\{0} .i0.D".format(FF['name'])
+        if "[" in FF['name']:
+            verilogString = "\{0} .i0.D".format(FF['name'])
+        else:
+            verilogString = "{0}.i0.D".format(FF['name'])
 
         # include parent modules
         module = FF['module']

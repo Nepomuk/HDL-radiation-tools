@@ -57,7 +57,7 @@ package $packageName is
   );
 
   -- get a flip flop name and path by its ID
-  function getFlipFlop( n : in integer, seu_FF : in std_logic ) return string;
+  function getFlipFlop( n : in integer; seu_FF : in std_logic := '0' ) return string;
 end;
 
 package body $packageName is
@@ -72,6 +72,8 @@ package body $packageName is
   ) is
     variable flipped_signal : string( 1 to 3 );
   begin
+    seu <= '0';
+
     wait until rising_edge(clk);
     if seu_FF = '1' then
       -- make the SEU appear in the middle of the high phase
@@ -79,7 +81,7 @@ package body $packageName is
     else
       -- make the SEU appear on a rising edge of the clock
       wait for (clk_p - duration_glitch/2);
-    end if
+    end if;
 
     if seu_FF = '1' then
       flipped_signal := "'b1";
@@ -89,7 +91,9 @@ package body $packageName is
       flipped_signal := "'b1";
     end if;
 
+    seu <= '1';
     produce_SEU_glitch(getFlipFlop(src, seu_FF), flipped_signal);
+    seu <= '0';
   end procedure;
 
 
@@ -112,7 +116,7 @@ package body $packageName is
 
 
   -- get a flip flop name and path by its ID
-  function getFlipFlop( n : in integer, seu_FF : in std_logic )
+  function getFlipFlop( n : in integer; seu_FF : in std_logic := '0' )
   return string is
   begin
     if seu_FF = '1' then
