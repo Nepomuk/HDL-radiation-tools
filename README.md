@@ -134,7 +134,11 @@ If you are using another system to develop, you have to search for alternatives.
 
 It is based on this [verlog parser](https://github.com/yellekelyk/PyVerilog) by [yellekelyk](https://github.com/yellekelyk) which uses the [pyparsing](http://pyparsing.wikispaces.com/) module.
 
-The files belonging to this part a located in the subfolder `flipflopfinder`.
+Files belonging to this part:
+
+* `flipflopfinder/flipflopfinder.py`
+* `flipflopfinder/flipflopfinder_template.vhd`
+* `flipflopfinder/verilogParse.py`
 
 
 ### Installation
