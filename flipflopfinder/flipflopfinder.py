@@ -13,12 +13,14 @@
 #
 #  Revisions:
 #    1.0 Initial revision
+#    1.1 UMC and IBM compatible
 #
 # ------------------------------------------------------------------------------
 
 # Import stuff
 import sys          # system functions (like exit)
 import time         # time functions
+import re           # regular expressions
 from os.path import basename, splitext, getsize     # some useful functions for filenames
 from pprint import pprint                           # nice print (used for debug)
 from pyparsing import ParseException                # parsing features
@@ -33,7 +35,9 @@ _verbose = 1
 _templateFile = "flipflopfinder_template.vhd"
 
 # which cells represent flip flops?
-_FFcells = ['DFF', 'DFFR', 'DFFS', 'DFFSR', 'SDFF', 'SDFFR', 'SDFFS', 'SDFFSR']
+_FFcellsIBM = ['DFF', 'DFFR', 'DFFS', 'DFFSR', 'SDFF', 'SDFFR', 'SDFFS', 'SDFFSR']
+_FFcellsUMC = ['DFCM', 'DFCQM', 'DFCQRSM', 'DFCRSM', 'DFEM', 'DFEQM', 'DFEQRM', 'DFEQZRM', 'DFERM', 'DFEZRM', 'DFM', 'DFMM', 'DFMQM', 'DFQM', 'DFQRM', 'DFQRSM', 'DFQSM', 'DFQZRM', 'DFRM', 'DFRSM', 'DFSM', 'DFZRM']
+_FFcellsUMC_re = re.compile('[S]?(?P<type>[A-Z]+)[1248]{1}NM')
 
 
 # initialize global values
@@ -42,6 +46,7 @@ _outFile = None
 _topLevelName = ""
 _verilogTokens = []
 _FF = []
+_technology = "?"
 _instances = {}
 _listOfModules = []
 _verilogInstanceStrings = []
@@ -105,7 +110,7 @@ def parseFile():
 
 # Search and find Flip Flops
 def searchFlipFlops():
-    global _instances
+    global _instances, _technology
 
     if _verbose > 0:
         print "Searching for flip flops ..."
@@ -114,16 +119,29 @@ def searchFlipFlops():
         for instance in module[1]:
             instanceType = instance[0]
             instanceName = instance[1][0][0]
+            UMCmatch = _FFcellsUMC_re.match(instanceType)
 
-            # check for FF cells
-            if instanceType.split('_')[0] in _FFcells:
+            # check for FF cells from IBM
+            if (_technology == "IBM" or _technology == "?") and instanceType.split('_')[0] in _FFcellsIBM:
+                _technology = "IBM"
                 _FF.append({
                     'type': instanceType,
                     'name': instanceName,
                     'module': moduleName
                 })
                 if _verbose > 1:
-                    print "  found {0} for '{1}' in module '{2}'".format(instanceType, instanceName, moduleName)
+                    print "  found {0} (IBM) for '{1}' in module '{2}'".format(instanceType, instanceName, moduleName)
+
+            # check for FF cells from UMC
+            elif (_technology == "UMC" or _technology == "?") and UMCmatch and UMCmatch.group('type') in _FFcellsUMC:
+                _technology = "UMC"
+                _FF.append({
+                    'type': instanceType,
+                    'name': instanceName,
+                    'module': moduleName
+                })
+                if _verbose > 1:
+                    print "  found {0} (UMC) for '{1}' in module '{2}'".format(instanceType, instanceName, moduleName)
 
             # found a module, put it into dict. for reverse searching
             if instanceType in _listOfModules:
@@ -146,11 +164,17 @@ def searchFlipFlops():
 def buildInstanceList():
     global _verilogInstanceStrings
     for FF in _FF:
+        # how is the inner part of the register called?
+        if _technology == "UMC":
+            innerFF = FF['type'] + "_inst"
+        else:
+            innerFF = "i0"
+
         # basis of the string
         if "[" in FF['name']:
-            verilogString = "\{0} .i0.D".format(FF['name'])
+            verilogString = "\{0} .{1}.D".format(FF['name'], innerFF)
         else:
-            verilogString = "{0}.i0.D".format(FF['name'])
+            verilogString = "{0}.{1}.D".format(FF['name'], innerFF)
 
         # include parent modules
         module = FF['module']
