@@ -60,9 +60,9 @@
 #   1.0.10 - Fixed change added in 1.0.9 to work for all identifiers, not just those used
 #           for udpInstance.
 #
-import pdb
-import time
-import pprint
+# import pdb
+# import time
+# import pprint
 import sys
 
 __version__ = "1.0.10"
@@ -71,7 +71,7 @@ from pyparsing import Literal, CaselessLiteral, Keyword, Word, Upcase, OneOrMore
         Forward, NotAny, delimitedList, Group, Optional, Combine, alphas, nums, restOfLine, cStyleComment, \
         alphanums, printables, dblQuotedString, empty, ParseException, ParseResults, MatchFirst, oneOf, GoToColumn, \
         ParseResults,StringEnd, FollowedBy, ParserElement, And, Regex, cppStyleComment#,__version__
-import pyparsing
+# import pyparsing
 usePackrat = True
 usePsyco = False
 
@@ -108,17 +108,17 @@ def Verilog_BNF():
     if verilogbnf is None:
 
         # compiler directives
-        compilerDirective = Combine( "`" + \
-            oneOf("define undef ifdef else endif default_nettype "
-                  "include resetall timescale unconnected_drive "
-                  "nounconnected_drive celldefine endcelldefine") + \
-            restOfLine ).setName("compilerDirective")
+        # compilerDirective = Combine( "`" + \
+        #     oneOf("define undef ifdef else endif default_nettype "
+        #           "include resetall timescale unconnected_drive "
+        #           "nounconnected_drive celldefine endcelldefine") + \
+        #     restOfLine ).setName("compilerDirective")
 
         # primitives
         semi = Literal(";")
-        lpar = Literal("(")
-        rpar = Literal(")")
-        equals = Literal("=")
+        # lpar = Literal("(")
+        # rpar = Literal(")")
+        # equals = Literal("=")
 
         identLead = alphas+"$_"
         identBody = alphanums+"$_"
@@ -147,7 +147,7 @@ def Verilog_BNF():
         subscrRef = Group("[" + delimitedList( expr, ":" ) + "]")
         subscrIdentifier = Group( identifier + Optional( subscrRef ) )
         #~ scalarConst = "0" | (( FollowedBy('1') + oneOf("1'b0 1'b1 1'bx 1'bX 1'B0 1'B1 1'Bx 1'BX 1") ))
-        scalarConst = Regex("0|1('[Bb][01xX])?")
+        # scalarConst = Regex("0|1('[Bb][01xX])?")
         mintypmaxExpr = Group( expr + ":" + expr + ":" + expr ).setName("mintypmax")
         primary = (
                   number |
@@ -173,53 +173,53 @@ def Verilog_BNF():
         lvalue = subscrIdentifier | concat
 
         # keywords
-        if_        = Keyword("if")
-        else_      = Keyword("else")
-        edge       = Keyword("edge")
-        posedge    = Keyword("posedge")
-        negedge    = Keyword("negedge")
-        specify    = Keyword("specify")
-        endspecify = Keyword("endspecify")
-        fork       = Keyword("fork")
-        join       = Keyword("join")
+        # if_        = Keyword("if")
+        # else_      = Keyword("else")
+        # edge       = Keyword("edge")
+        # posedge    = Keyword("posedge")
+        # negedge    = Keyword("negedge")
+        # specify    = Keyword("specify")
+        # endspecify = Keyword("endspecify")
+        # fork       = Keyword("fork")
+        # join       = Keyword("join")
         begin      = Keyword("begin")
         end        = Keyword("end")
-        default    = Keyword("default")
-        forever    = Keyword("forever")
-        repeat     = Keyword("repeat")
-        while_     = Keyword("while")
-        for_       = Keyword("for")
-        case       = oneOf( "case casez casex" )
-        endcase    = Keyword("endcase")
-        wait       = Keyword("wait")
+        # default    = Keyword("default")
+        # forever    = Keyword("forever")
+        # repeat     = Keyword("repeat")
+        # while_     = Keyword("while")
+        # for_       = Keyword("for")
+        # case       = oneOf( "case casez casex" )
+        # endcase    = Keyword("endcase")
+        # wait       = Keyword("wait")
         disable    = Keyword("disable")
         deassign   = Keyword("deassign")
-        force      = Keyword("force")
+        # force      = Keyword("force")
         release    = Keyword("release")
-        assign     = Keyword("assign")
+        # assign     = Keyword("assign")
 
-        eventExpr = Forward()
-        eventTerm = ( posedge + expr ) | ( negedge + expr ) | expr | ( "(" + eventExpr + ")" )
-        eventExpr << (
-            Group( delimitedList( eventTerm, "or" ) )
-            )
-        eventControl = Group( "@" + ( ( "(" + eventExpr + ")" ) | identifier | "*" ) ).setName("eventCtrl")
+        # eventExpr = Forward()
+        # eventTerm = ( posedge + expr ) | ( negedge + expr ) | expr | ( "(" + eventExpr + ")" )
+        # eventExpr << (
+        #     Group( delimitedList( eventTerm, "or" ) )
+        #     )
+        # eventControl = Group( "@" + ( ( "(" + eventExpr + ")" ) | "*" ) ).setName("eventCtrl")
 
-        delayArg = ( number |
-                     Word(alphanums+"$_") | #identifier |
-                     ( "(" + Group( delimitedList( mintypmaxExpr | expr ) ) + ")" )
-                   ).setName("delayArg")#.setDebug()
-        delay = Group( "#" + delayArg ).setName("delay")#.setDebug()
-        delayOrEventControl = delay | eventControl
+        # delayArg = ( number |
+        #              Word(alphanums+"$_") | #identifier |
+        #              ( "(" + Group( delimitedList( mintypmaxExpr | expr ) ) + ")" )
+        #            ).setName("delayArg")#.setDebug()
+        # delay = Group( "#" + delayArg ).setName("delay")#.setDebug()
+        # delayOrEventControl = delay | eventControl
 
-        assgnmt   = Group( lvalue + "=" + Optional( delayOrEventControl ) + expr ).setName( "assgnmt" )
-        nbAssgnmt = Group(( lvalue + "<=" + Optional( delay ) + expr ) |
-                     ( lvalue + "<=" + Optional( eventControl ) + expr )).setName( "nbassgnmt" )
+        # assgnmt   = Group( lvalue + "=" + Optional( delayOrEventControl ) + expr ).setName( "assgnmt" )
+        # nbAssgnmt = Group(( lvalue + "<=" + Optional( delay ) + expr ) |
+        #              ( lvalue + "<=" + Optional( eventControl ) + expr )).setName( "nbassgnmt" )
 
         range = "[" + expr + ":" + expr + "]"
 
-        paramAssgnmt = Group( identifier + "=" + expr ).setName("paramAssgnmt")
-        parameterDecl = Group( "parameter" + Optional( range ) + delimitedList( paramAssgnmt ) + semi).setName("paramDecl")
+        # paramAssgnmt = Group( identifier + "=" + expr ).setName("paramAssgnmt")
+        # parameterDecl = Group( "parameter" + Optional( range ) + delimitedList( paramAssgnmt ) + semi).setName("paramDecl")
 
         inputDecl = Group( "input" + Optional( range ) + delimitedList( identifier ) + semi )
         outputDecl = Group( "output" + Optional( range ) + delimitedList( identifier ) + semi )
@@ -227,54 +227,54 @@ def Verilog_BNF():
 
         regIdentifier = Group( identifier + Optional( "[" + expr + ":" + expr + "]" ) )
         regDecl = Group( "reg" + Optional("signed") + Optional( range ) + delimitedList( regIdentifier ) + semi ).setName("regDecl")
-        timeDecl = Group( "time" + delimitedList( regIdentifier ) + semi )
-        integerDecl = Group( "integer" + delimitedList( regIdentifier ) + semi )
+        # timeDecl = Group( "time" + delimitedList( regIdentifier ) + semi )
+        # integerDecl = Group( "integer" + delimitedList( regIdentifier ) + semi )
 
-        strength0 = oneOf("supply0  strong0  pull0  weak0  highz0")
-        strength1 = oneOf("supply1  strong1  pull1  weak1  highz1")
-        driveStrength = Group( "(" + ( ( strength0 + "," + strength1 ) |
-                                       ( strength1 + "," + strength0 ) ) + ")" ).setName("driveStrength")
+        # strength0 = oneOf("supply0  strong0  pull0  weak0  highz0")
+        # strength1 = oneOf("supply1  strong1  pull1  weak1  highz1")
+        # driveStrength = Group( "(" + ( ( strength0 + "," + strength1 ) |
+        #                                ( strength1 + "," + strength0 ) ) + ")" ).setName("driveStrength")
         nettype = oneOf("wire  tri  tri1  supply0  wand  triand  tri0  supply1  wor  trior  trireg")
         expandRange = Optional( oneOf("scalared vectored") ) + range
-        realDecl = Group( "real" + delimitedList( identifier ) + semi )
+        # realDecl = Group( "real" + delimitedList( identifier ) + semi )
 
         eventDecl = Group( "event" + delimitedList( identifier ) + semi )
 
         blockDecl = (
-            parameterDecl |
+            # parameterDecl |
             regDecl |
-            integerDecl |
-            realDecl |
-            timeDecl |
+            # integerDecl |
+            # realDecl |
+            # timeDecl |
             eventDecl
             )
 
         stmt = Forward().setName("stmt")#.setDebug()
-        stmtOrNull = stmt | semi
-        caseItem = ( delimitedList( expr ) + ":" + stmtOrNull ) | \
-                   ( default + Optional(":") + stmtOrNull )
+        # stmtOrNull = stmt | semi
+        # caseItem = ( delimitedList( expr ) + ":" + stmtOrNull ) | \
+        #            ( default + Optional(":") + stmtOrNull )
         stmt << Group(
             ( begin + Group( ZeroOrMore( stmt ) ) + end ).setName("begin-end") |
-            ( if_ + Group("(" + expr + ")") + stmtOrNull + Optional( else_ + stmtOrNull ) ).setName("if") |
-            ( delayOrEventControl + stmtOrNull ) |
-            ( case + "(" + expr + ")" + OneOrMore( caseItem ) + endcase ) |
-            ( forever + stmt ) |
-            ( repeat + "(" + expr + ")" + stmt ) |
-            ( while_ + "(" + expr + ")" + stmt ) |
-            ( for_ + "(" + assgnmt + semi + Group( expr ) + semi + assgnmt + ")" + stmt ) |
-            ( fork + ZeroOrMore( stmt ) + join ) |
-            ( fork + ":" + identifier + ZeroOrMore( blockDecl ) + ZeroOrMore( stmt ) + end ) |
-            ( wait + "(" + expr + ")" + stmtOrNull ) |
+            # ( if_ + Group("(" + expr + ")") + stmtOrNull + Optional( else_ + stmtOrNull ) ).setName("if") |
+            # ( delayOrEventControl + stmtOrNull ) |
+            # ( case + "(" + expr + ")" + OneOrMore( caseItem ) + endcase ) |
+            # ( forever + stmt ) |
+            # ( repeat + "(" + expr + ")" + stmt ) |
+            # ( while_ + "(" + expr + ")" + stmt ) |
+            # ( for_ + "(" + assgnmt + semi + Group( expr ) + semi + assgnmt + ")" + stmt ) |
+            # ( fork + ZeroOrMore( stmt ) + join ) |
+            # ( fork + ":" + identifier + ZeroOrMore( blockDecl ) + ZeroOrMore( stmt ) + end ) |
+            # ( wait + "(" + expr + ")" + stmtOrNull ) |
             ( "->" + identifier + semi ) |
             ( disable + identifier + semi ) |
-            ( assign + assgnmt + semi ) |
+            # ( assign + assgnmt + semi ) |
             ( deassign + lvalue + semi ) |
-            ( force + assgnmt + semi ) |
+            # ( force + assgnmt + semi ) |
             ( release + lvalue + semi ) |
             ( begin + ":" + identifier + ZeroOrMore( blockDecl ) + ZeroOrMore( stmt ) + end ).setName("begin:label-end") |
             # these  *have* to go at the end of the list!!!
-            ( assgnmt + semi ) |
-            ( nbAssgnmt + semi ) |
+            # ( assgnmt + semi ) |
+            # ( nbAssgnmt + semi ) |
             ( Combine( Optional("$") + identifier ) + Optional( "(" + delimitedList(expr|empty) + ")" ) + semi )
             ).setName("stmtBody")
         """
@@ -303,72 +303,72 @@ def Verilog_BNF():
         x||= force <assignment> ;
         x||= release <lvalue> ;
         """
-        alwaysStmt = Group( "always" + Optional(eventControl) + stmt ).setName("alwaysStmt")
-        initialStmt = Group( "initial" + stmt ).setName("initialStmt")
+        # alwaysStmt = Group( "always" + Optional(eventControl) + stmt ).setName("alwaysStmt")
+        # initialStmt = Group( "initial" + stmt ).setName("initialStmt")
 
         chargeStrength = Group( "(" + oneOf( "small medium large" ) + ")" ).setName("chargeStrength")
 
-        continuousAssign = Group(
-            assign + Optional( driveStrength ) + Optional( delay ) + delimitedList( assgnmt ) + semi
-            ).setName("continuousAssign")
+        # continuousAssign = Group(
+        #     assign + Optional( driveStrength ) + Optional( delay ) + delimitedList( assgnmt ) + semi
+        #     ).setName("continuousAssign")
 
 
-        tfDecl = (
-            parameterDecl |
-            inputDecl |
-            outputDecl |
-            inoutDecl |
-            regDecl |
-            timeDecl |
-            integerDecl |
-            realDecl
-            )
+        # tfDecl = (
+        #     # parameterDecl |
+        #     inputDecl |
+        #     outputDecl |
+        #     inoutDecl |
+        #     regDecl #|
+        #     # timeDecl |
+        #     # integerDecl |
+        #     # realDecl
+        #     )
 
-        functionDecl = Group(
-            "function" + Optional( range | "integer" | "real" ) + identifier + semi +
-            Group( OneOrMore( tfDecl ) ) +
-            Group( ZeroOrMore( stmt ) ) +
-            "endfunction"
-            )
+        # functionDecl = Group(
+        #     "function" + Optional( range | "integer" | "real" ) + identifier + semi +
+        #     Group( OneOrMore( tfDecl ) ) +
+        #     Group( ZeroOrMore( stmt ) ) +
+        #     "endfunction"
+        #     )
 
         inputOutput = oneOf("input output")
         netDecl1Arg = ( nettype +
             Optional( expandRange ) +
-            Optional( delay ) +
+            # Optional( delay ) +
             Group( delimitedList( ~inputOutput + identifier ) ) )
         netDecl2Arg = ( "trireg" +
             Optional( chargeStrength ) +
             Optional( expandRange ) +
-            Optional( delay ) +
+            # Optional( delay ) +
             Group( delimitedList( ~inputOutput + identifier ) ) )
         netDecl3Arg = ( nettype +
-            Optional( driveStrength ) +
-            Optional( expandRange ) +
-            Optional( delay ) +
-            Group( delimitedList( assgnmt ) ) )
+            # Optional( driveStrength ) +
+            Optional( expandRange ) ) #+
+            # Optional( delay ) +
+            # Group( delimitedList( assgnmt ) ) )
         netDecl1 = Group(netDecl1Arg + semi)
         netDecl2 = Group(netDecl2Arg + semi)
         netDecl3 = Group(netDecl3Arg + semi)
 
-        gateType = oneOf("and  nand  or  nor xor  xnor buf  bufif0 bufif1 "
-                         "not  notif0 notif1  pulldown pullup nmos  rnmos "
-                         "pmos rpmos cmos rcmos   tran rtran  tranif0  "
-                         "rtranif0  tranif1 rtranif1"  )
-        gateInstance = Optional( Group( identifier + Optional( range ) ) ) + \
-                        "(" + Group( delimitedList( expr ) ) + ")"
-        gateDecl = Group( gateType +
-            Optional( driveStrength ) +
-            Optional( delay ) +
-            delimitedList( gateInstance) +
-            semi )
+        # gateType = oneOf("and  nand  or  nor xor  xnor buf  bufif0 bufif1 "
+        #                  "not  notif0 notif1  pulldown pullup nmos  rnmos "
+        #                  "pmos rpmos cmos rcmos   tran rtran  tranif0  "
+        #                  "rtranif0  tranif1 rtranif1"  )
+        # gateInstance = Optional( Group( identifier + Optional( range ) ) ) + \
+        #                 "(" + Group( delimitedList( expr ) ) + ")"
+        # gateDecl = Group( gateType +
+        #     # Optional( driveStrength ) +
+        #     # Optional( delay ) +
+        #     delimitedList( gateInstance) +
+        #     semi )
 
-        udpInstance = Group( Group( identifier + Optional(range | subscrRef) ) +
-            "(" + Group( delimitedList( expr ) ) + ")" )
-        udpInstantiation = Group( identifier -
-            Optional( driveStrength ) +
-            Optional( delay ) +
-            delimitedList( udpInstance ) +
-            semi ).setName("udpInstantiation")#.setParseAction(dumpTokens).setDebug()
+        # udpInstance = Group( Group( identifier + Optional(range | subscrRef) ) +
+        #     "(" + Group( delimitedList( expr ) ) + ")" )
+        # udpInstantiation = Group( identifier -
+        #     Optional( driveStrength ) +
+        #     Optional( delay ) +
+        #     delimitedList( udpInstance ) +
+        #     semi ).setName("udpInstantiation")#.setParseAction(dumpTokens).setDebug()
 
         parameterValueAssignment = Group( Literal("#") + "(" + Group( delimitedList( expr ) ) + ")" )
         namedPortConnection = Group( "." + identifier + "(" + expr + ")" )
@@ -385,116 +385,116 @@ def Verilog_BNF():
             delimitedList( moduleInstance ).setName("moduleInstanceList") +
             semi ).setName("moduleInstantiation")
 
-        parameterOverride = Group( "defparam" + delimitedList( paramAssgnmt ) + semi )
-        task = Group( "task" + identifier + semi +
-            ZeroOrMore( tfDecl ) +
-            stmtOrNull +
-            "endtask" )
+        # parameterOverride = Group( "defparam" + delimitedList( paramAssgnmt ) + semi )
+        # task = Group( "task" + identifier + semi +
+        #     ZeroOrMore( tfDecl ) +
+        #     stmtOrNull +
+        #     "endtask" )
 
-        specparamDecl = Group( "specparam" + delimitedList( paramAssgnmt ) + semi )
+        # specparamDecl = Group( "specparam" + delimitedList( paramAssgnmt ) + semi )
 
-        pathDescr1 = Group( "(" + subscrIdentifier + "=>" + subscrIdentifier + ")" )
-        pathDescr2 = Group( "(" + Group( delimitedList( subscrIdentifier ) ) + "*>" +
-                                  Group( delimitedList( subscrIdentifier ) ) + ")" )
-        pathDescr3 = Group( "(" + Group( delimitedList( subscrIdentifier ) ) + "=>" +
-                                  Group( delimitedList( subscrIdentifier ) ) + ")" )
-        pathDelayValue = Group( ( "(" + Group( delimitedList( mintypmaxExpr | expr ) ) + ")" ) |
-                                 mintypmaxExpr |
-                                 expr )
-        pathDecl = Group( ( pathDescr1 | pathDescr2 | pathDescr3 ) + "=" + pathDelayValue + semi ).setName("pathDecl")
+        # pathDescr1 = Group( "(" + subscrIdentifier + "=>" + subscrIdentifier + ")" )
+        # pathDescr2 = Group( "(" + Group( delimitedList( subscrIdentifier ) ) + "*>" +
+        #                           Group( delimitedList( subscrIdentifier ) ) + ")" )
+        # pathDescr3 = Group( "(" + Group( delimitedList( subscrIdentifier ) ) + "=>" +
+        #                           Group( delimitedList( subscrIdentifier ) ) + ")" )
+        # pathDelayValue = Group( ( "(" + Group( delimitedList( mintypmaxExpr | expr ) ) + ")" ) |
+        #                          mintypmaxExpr |
+        #                          expr )
+        # pathDecl = Group( ( pathDescr1 | pathDescr2 | pathDescr3 ) + "=" + pathDelayValue + semi ).setName("pathDecl")
 
         portConditionExpr = Forward()
         portConditionTerm = Optional(unop) + subscrIdentifier
         portConditionExpr << portConditionTerm + Optional( binop + portConditionExpr )
-        polarityOp = oneOf("+ -")
-        levelSensitivePathDecl1 = Group(
-            if_ + Group("(" + portConditionExpr + ")") +
-            subscrIdentifier + Optional( polarityOp ) + "=>" + subscrIdentifier + "=" +
-            pathDelayValue +
-            semi )
-        levelSensitivePathDecl2 = Group(
-            if_ + Group("(" + portConditionExpr + ")") +
-            lpar + Group( delimitedList( subscrIdentifier ) ) + Optional( polarityOp ) + "*>" +
-                Group( delimitedList( subscrIdentifier ) ) + rpar + "=" +
-            pathDelayValue +
-            semi )
-        levelSensitivePathDecl = levelSensitivePathDecl1 | levelSensitivePathDecl2
+        # polarityOp = oneOf("+ -")
+        # levelSensitivePathDecl1 = Group(
+        #     if_ + Group("(" + portConditionExpr + ")") +
+        #     subscrIdentifier + Optional( polarityOp ) + "=>" + subscrIdentifier + "=" +
+        #     pathDelayValue +
+        #     semi )
+        # levelSensitivePathDecl2 = Group(
+        #     if_ + Group("(" + portConditionExpr + ")") +
+        #     lpar + Group( delimitedList( subscrIdentifier ) ) + Optional( polarityOp ) + "*>" +
+        #         Group( delimitedList( subscrIdentifier ) ) + rpar + "=" +
+        #     pathDelayValue +
+        #     semi )
+        # levelSensitivePathDecl = levelSensitivePathDecl1 | levelSensitivePathDecl2
 
-        edgeIdentifier = posedge | negedge
-        edgeSensitivePathDecl1 = Group(
-            Optional( if_ + Group("(" + expr + ")") ) +
-            lpar + Optional( edgeIdentifier ) +
-            subscrIdentifier + "=>" +
-            lpar + subscrIdentifier + Optional( polarityOp ) + ":" + expr + rpar + rpar +
-            "=" +
-            pathDelayValue +
-            semi )
-        edgeSensitivePathDecl2 = Group(
-            Optional( if_ + Group("(" + expr + ")") ) +
-            lpar + Optional( edgeIdentifier ) +
-            subscrIdentifier + "*>" +
-            lpar + delimitedList( subscrIdentifier ) + Optional( polarityOp ) + ":" + expr + rpar + rpar +
-            "=" +
-            pathDelayValue +
-            semi )
-        edgeSensitivePathDecl = edgeSensitivePathDecl1 | edgeSensitivePathDecl2
+        # edgeIdentifier = posedge | negedge
+        # edgeSensitivePathDecl1 = Group(
+        #     Optional( if_ + Group("(" + expr + ")") ) +
+        #     lpar + Optional( edgeIdentifier ) +
+        #     subscrIdentifier + "=>" +
+        #     lpar + subscrIdentifier + Optional( polarityOp ) + ":" + expr + rpar + rpar +
+        #     "=" +
+        #     pathDelayValue +
+        #     semi )
+        # edgeSensitivePathDecl2 = Group(
+        #     Optional( if_ + Group("(" + expr + ")") ) +
+        #     lpar + Optional( edgeIdentifier ) +
+        #     subscrIdentifier + "*>" +
+        #     lpar + delimitedList( subscrIdentifier ) + Optional( polarityOp ) + ":" + expr + rpar + rpar +
+        #     "=" +
+        #     pathDelayValue +
+        #     semi )
+        # edgeSensitivePathDecl = edgeSensitivePathDecl1 | edgeSensitivePathDecl2
 
-        edgeDescr = oneOf("01 10 0x x1 1x x0").setName("edgeDescr")
+        # edgeDescr = oneOf("01 10 0x x1 1x x0").setName("edgeDescr")
 
-        timCheckEventControl = Group( posedge | negedge | (edge + "[" + delimitedList( edgeDescr ) + "]" ))
-        timCheckCond = Forward()
-        timCondBinop = oneOf("== === != !==")
-        timCheckCondTerm = ( expr + timCondBinop + scalarConst ) | ( Optional("~") + expr )
-        timCheckCond << ( ( "(" + timCheckCond + ")" ) | timCheckCondTerm )
-        timCheckEvent = Group( Optional( timCheckEventControl ) +
-                                subscrIdentifier +
-                                Optional( "&&&" + timCheckCond ) )
-        timCheckLimit = expr
-        controlledTimingCheckEvent = Group( timCheckEventControl + subscrIdentifier +
-                                            Optional( "&&&" + timCheckCond ) )
-        notifyRegister = identifier
+        # timCheckEventControl = Group( posedge | negedge | (edge + "[" + delimitedList( edgeDescr ) + "]" ))
+        # timCheckCond = Forward()
+        # timCondBinop = oneOf("== === != !==")
+        # timCheckCondTerm = ( expr + timCondBinop + scalarConst ) | ( Optional("~") + expr )
+        # timCheckCond << ( ( "(" + timCheckCond + ")" ) | timCheckCondTerm )
+        # timCheckEvent = Group( Optional( timCheckEventControl ) +
+        #                         subscrIdentifier +
+        #                         Optional( "&&&" + timCheckCond ) )
+        # timCheckLimit = expr
+        # controlledTimingCheckEvent = Group( timCheckEventControl + subscrIdentifier +
+        #                                     Optional( "&&&" + timCheckCond ) )
+        # notifyRegister = identifier
 
-        systemTimingCheck1 = Group( "$setup" +
-            lpar + timCheckEvent + "," + timCheckEvent + "," + timCheckLimit +
-            Optional( "," + notifyRegister ) + rpar +
-            semi )
-        systemTimingCheck2 = Group( "$hold" +
-            lpar + timCheckEvent + "," + timCheckEvent + "," + timCheckLimit +
-            Optional( "," + notifyRegister ) + rpar +
-            semi )
-        systemTimingCheck3 = Group( "$period" +
-            lpar + controlledTimingCheckEvent + "," + timCheckLimit +
-            Optional( "," + notifyRegister ) + rpar +
-            semi )
-        systemTimingCheck4 = Group( "$width" +
-            lpar + controlledTimingCheckEvent + "," + timCheckLimit +
-            Optional( "," + expr + "," + notifyRegister ) + rpar +
-            semi )
-        systemTimingCheck5 = Group( "$skew" +
-            lpar + timCheckEvent + "," + timCheckEvent + "," + timCheckLimit +
-            Optional( "," + notifyRegister ) + rpar +
-            semi )
-        systemTimingCheck6 = Group( "$recovery" +
-            lpar + controlledTimingCheckEvent + "," + timCheckEvent + "," + timCheckLimit +
-            Optional( "," + notifyRegister ) + rpar +
-            semi )
-        systemTimingCheck7 = Group( "$setuphold" +
-            lpar + timCheckEvent + "," + timCheckEvent + "," + timCheckLimit + "," + timCheckLimit +
-            Optional( "," + notifyRegister ) + rpar +
-            semi )
-        systemTimingCheck = (FollowedBy('$') + ( systemTimingCheck1 | systemTimingCheck2 | systemTimingCheck3 |
-            systemTimingCheck4 | systemTimingCheck5 | systemTimingCheck6 | systemTimingCheck7 )).setName("systemTimingCheck")
-        sdpd = if_ + Group("(" + expr + ")") + \
-            ( pathDescr1 | pathDescr2 ) + "=" + pathDelayValue + semi
+        # systemTimingCheck1 = Group( "$setup" +
+        #     lpar + timCheckEvent + "," + timCheckEvent + "," + timCheckLimit +
+        #     Optional( "," + notifyRegister ) + rpar +
+        #     semi )
+        # systemTimingCheck2 = Group( "$hold" +
+        #     lpar + timCheckEvent + "," + timCheckEvent + "," + timCheckLimit +
+        #     Optional( "," + notifyRegister ) + rpar +
+        #     semi )
+        # systemTimingCheck3 = Group( "$period" +
+        #     lpar + controlledTimingCheckEvent + "," + timCheckLimit +
+        #     Optional( "," + notifyRegister ) + rpar +
+        #     semi )
+        # systemTimingCheck4 = Group( "$width" +
+        #     lpar + controlledTimingCheckEvent + "," + timCheckLimit +
+        #     Optional( "," + expr + "," + notifyRegister ) + rpar +
+        #     semi )
+        # systemTimingCheck5 = Group( "$skew" +
+        #     lpar + timCheckEvent + "," + timCheckEvent + "," + timCheckLimit +
+        #     Optional( "," + notifyRegister ) + rpar +
+        #     semi )
+        # systemTimingCheck6 = Group( "$recovery" +
+        #     lpar + controlledTimingCheckEvent + "," + timCheckEvent + "," + timCheckLimit +
+        #     Optional( "," + notifyRegister ) + rpar +
+        #     semi )
+        # systemTimingCheck7 = Group( "$setuphold" +
+        #     lpar + timCheckEvent + "," + timCheckEvent + "," + timCheckLimit + "," + timCheckLimit +
+        #     Optional( "," + notifyRegister ) + rpar +
+        #     semi )
+        # systemTimingCheck = (FollowedBy('$') + ( systemTimingCheck1 | systemTimingCheck2 | systemTimingCheck3 |
+        #     systemTimingCheck4 | systemTimingCheck5 | systemTimingCheck6 | systemTimingCheck7 )).setName("systemTimingCheck")
+        # sdpd = if_ + Group("(" + expr + ")") + \
+        #     ( pathDescr1 | pathDescr2 ) + "=" + pathDelayValue + semi
 
-        specifyItem = ~Keyword("endspecify") +(
-            specparamDecl |
-            pathDecl |
-            levelSensitivePathDecl |
-            edgeSensitivePathDecl |
-            systemTimingCheck |
-            sdpd
-            )
+        # specifyItem = ~Keyword("endspecify") +(
+        #     specparamDecl |
+        #     pathDecl |
+        #     levelSensitivePathDecl |
+        #     edgeSensitivePathDecl |
+        #     systemTimingCheck |
+        #     sdpd
+        #     )
         """
         x::= <specparam_declaration>
         x||= <path_declaration>
@@ -503,10 +503,10 @@ def Verilog_BNF():
         x||= <system_timing_check>
         x||= <sdpd>
         """
-        specifyBlock = Group( "specify" + ZeroOrMore( specifyItem ) + "endspecify" )
+        # specifyBlock = Group( "specify" + ZeroOrMore( specifyItem ) + "endspecify" )
 
         moduleItem = ~Keyword("endmodule") + (
-            parameterDecl |
+            # parameterDecl |
             inputDecl |
             outputDecl |
             inoutDecl |
@@ -514,21 +514,21 @@ def Verilog_BNF():
             netDecl3 |
             netDecl1 |
             netDecl2 |
-            timeDecl |
-            integerDecl |
-            realDecl |
-            eventDecl |
-            gateDecl |
-            parameterOverride |
-            continuousAssign |
-            specifyBlock |
-            initialStmt |
-            alwaysStmt |
-            task |
-            functionDecl |
+            # timeDecl |
+            # integerDecl |
+            # realDecl |
+            # eventDecl |
+            # gateDecl |
+            # parameterOverride |
+            # continuousAssign |
+            # specifyBlock |
+            # initialStmt |
+            # alwaysStmt |
+            # task |
+            # functionDecl |
             # these have to be at the end - they start with identifiers
-            moduleInstantiation |
-            udpInstantiation
+            moduleInstantiation #|
+            # udpInstantiation
             )
         """  All possible moduleItems, from Verilog grammar spec
         x::= <parameter_declaration>
@@ -565,27 +565,27 @@ def Verilog_BNF():
 
         module = Group(  moduleHdr +
                  Group( ZeroOrMore( moduleItem ) ) +
-                 "endmodule" ).setName("module")#.setDebug()
+                 "endmodule" ).setName("module").setParseAction(removeUselessStuff).setParseAction(printStatus)#.setDebug()
 
-        udpDecl = outputDecl | inputDecl | regDecl
+        # udpDecl = outputDecl | inputDecl | regDecl
         #~ udpInitVal = oneOf("1'b0 1'b1 1'bx 1'bX 1'B0 1'B1 1'Bx 1'BX 1 0 x X")
-        udpInitVal = (Regex("1'[bB][01xX]") | Regex("[01xX]")).setName("udpInitVal")
-        udpInitialStmt = Group( "initial" +
-            identifier + "=" + udpInitVal + semi ).setName("udpInitialStmt")
+        # udpInitVal = (Regex("1'[bB][01xX]") | Regex("[01xX]")).setName("udpInitVal")
+        # udpInitialStmt = Group( "initial" +
+        #     identifier + "=" + udpInitVal + semi ).setName("udpInitialStmt")
 
-        levelSymbol = oneOf("0   1   x   X   ?   b   B")
-        levelInputList = Group( OneOrMore( levelSymbol ).setName("levelInpList") )
-        outputSymbol = oneOf("0   1   x   X")
-        combEntry = Group( levelInputList + ":" + outputSymbol + semi )
-        edgeSymbol = oneOf("r   R   f   F   p   P   n   N   *")
-        edge = Group( "(" + levelSymbol + levelSymbol + ")" ) | \
-               Group( edgeSymbol )
-        edgeInputList = Group( ZeroOrMore( levelSymbol ) + edge + ZeroOrMore( levelSymbol ) )
-        inputList = levelInputList | edgeInputList
-        seqEntry = Group( inputList + ":" + levelSymbol + ":" + ( outputSymbol | "-" ) + semi ).setName("seqEntry")
-        udpTableDefn = Group( "table" +
-            OneOrMore( combEntry | seqEntry ) +
-            "endtable" ).setName("table")
+        # levelSymbol = oneOf("0   1   x   X   ?   b   B")
+        # levelInputList = Group( OneOrMore( levelSymbol ).setName("levelInpList") )
+        # outputSymbol = oneOf("0   1   x   X")
+        # combEntry = Group( levelInputList + ":" + outputSymbol + semi )
+        # edgeSymbol = oneOf("r   R   f   F   p   P   n   N   *")
+        # edge = Group( "(" + levelSymbol + levelSymbol + ")" ) | \
+        #        Group( edgeSymbol )
+        # edgeInputList = Group( ZeroOrMore( levelSymbol ) + edge + ZeroOrMore( levelSymbol ) )
+        # inputList = levelInputList | edgeInputList
+        # seqEntry = Group( inputList + ":" + levelSymbol + ":" + ( outputSymbol | "-" ) + semi ).setName("seqEntry")
+        # udpTableDefn = Group( "table" +
+        #     OneOrMore( combEntry | seqEntry ) +
+        #     "endtable" ).setName("table")
 
         """
         <UDP>
@@ -595,20 +595,45 @@ def Verilog_BNF():
                 <table_definition>
                 endprimitive
         """
-        udp = Group( "primitive" + identifier +
-            "(" + Group( delimitedList( identifier ) ) + ")" + semi +
-            OneOrMore( udpDecl ) +
-            Optional( udpInitialStmt ) +
-            udpTableDefn +
-            "endprimitive" )
+        # udp = Group( "primitive" + identifier +
+        #     "(" + Group( delimitedList( identifier ) ) + ")" + semi +
+        #     OneOrMore( udpDecl ) +
+        #     Optional( udpInitialStmt ) +
+        #     udpTableDefn +
+        #     "endprimitive" )
 
-        verilogbnf = OneOrMore( module | udp ) + StringEnd()
+        verilogbnf = OneOrMore( module ) + StringEnd()
 
         verilogbnf.ignore( cppStyleComment )
-        verilogbnf.ignore( compilerDirective )
+        # verilogbnf.ignore( compilerDirective )
 
     return verilogbnf
 
+
+def printStatus(s, l, t):
+    progress = float(l) / float(len(s))
+    out = "\rProgress: {0:5.1f}%  ({1:7d} / {2:7d} lines)".format(progress*100, l, len(s))
+    sys.stdout.write(out)
+    sys.stdout.flush()
+
+
+def removeUselessStuff(s,l,t):
+    # print t
+    # print "\n\n"
+    for i in range(len(t[0][0])):
+        if len(t[0][0]) > 2:
+            t[0][0] = [t[0][0][0], t[0][0][1]]
+    for i in range(len(t[0][1])):
+        if len(t[0][1][i]) == 3:
+            if t[0][1][i][0] == 'wire':
+                t[0][1][i] = ['wire']
+            else:
+                t[0][1][i][1][1] = []
+        else:
+            if t[0][1][i][0] == 'input' or t[0][1][i][0] == 'output':
+                t[0][1][i] = [t[0][1][i][0]]
+    # print t
+    # sys.exit(0)
 
 # def test( strng ):
 #     tokens = []
