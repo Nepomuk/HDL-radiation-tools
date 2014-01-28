@@ -14,6 +14,7 @@
 #  Revisions:
 #    1.0 Initial revision
 #    1.1 UMC and IBM compatible
+#    1.2 Move to regular expressions for parsing
 #
 # ------------------------------------------------------------------------------
 
@@ -105,17 +106,19 @@ def parseFile():
 
 
 def parseVerilog(lines):
+    # regular expressions for the synthesizer's output
     moduleStart_re = re.compile('^module (?P<module>\w+)\([\w, \n]+\);', re.MULTILINE)
     moduleEnd_re = re.compile('^endmodule$', re.MULTILINE)
     instance_re = re.compile('(?P<type>\w+) [\\\\]?(?P<name>[\w\[\]]+)\s?\([\w\s\\\\\[\]\(\){},.\']+\);', re.MULTILINE)
+
     moduleStartPos = 0
     moduleEndPos = 0
     moduleList = []
-
     while True:
+
         # determine the span of the module
         moduleStartMatch = moduleStart_re.search(lines, moduleEndPos)
-        if not moduleStartMatch: break
+        if not moduleStartMatch: break  # nothing more to do
         moduleStartPos = moduleStartMatch.end()
         moduleEndMatch = moduleEnd_re.search(lines, moduleStartPos)
         moduleEndPos = moduleEndMatch.start()
