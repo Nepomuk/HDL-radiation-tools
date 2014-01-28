@@ -23,8 +23,6 @@ import time         # time functions
 import re           # regular expressions
 from os.path import basename, splitext, getsize     # some useful functions for filenames
 from pprint import pprint                           # nice print (used for debug)
-from pyparsing import ParseException                # parsing features
-from verilogParse import Verilog_BNF as verilogBNF  # verilog parser
 from Cheetah.Template import Template               # template file
 
 
@@ -84,28 +82,53 @@ def parseFile():
 
     # convert text into tokens we can handle
     if _verbose > 0:
-        print "  parse the input into memory ... (might take a while)"
+        print "  parse the input into memory ..."
     startTime = time.clock()
     lines = "".join(lines)
-    try:
-        _verilogTokens = verilogBNF().parseString(lines)
-    except ParseException, err:
-        print err.line
-        print " "*(err.column-1) + "^"
-        print err
-        sys.exit()
-    _listOfModules = [x[0][1] for x in _verilogTokens]
+    _verilogTokens = parseVerilog(lines)
+    _listOfModules = [x[0] for x in _verilogTokens]
     stopTime = time.clock()
     totalTime = stopTime - startTime
 
     # some information output
     if _verbose > 0:
+        if totalTime > 0:
+            lineRate = nlines/totalTime
+        else:
+            lineRate = float("inf")
         print "  done converting {0} lines and {1} modules".format(nlines, len(_listOfModules))
-        print "  time spent: {0:.2f} sec  ({1:.1f} lines/sec)\n".format(totalTime, nlines/totalTime)
+        print "  time spent: {0:.2f} sec  ({1:.2e} lines/sec)\n".format(totalTime, lineRate)
     if _verbose > 2:
         print "Found the following modules:"
         pprint(_listOfModules, indent=2)
         print ""
+
+
+def parseVerilog(lines):
+    moduleStart_re = re.compile('^module (?P<module>\w+)\([\w, \n]+\);', re.MULTILINE)
+    moduleEnd_re = re.compile('^endmodule$', re.MULTILINE)
+    instance_re = re.compile('(?P<type>\w+) [\\\\]?(?P<name>[\w\[\]]+)\s?\([\w\s\\\\\[\]\(\){},.\']+\);', re.MULTILINE)
+    moduleStartPos = 0
+    moduleEndPos = 0
+    moduleList = []
+
+    while True:
+        # determine the span of the module
+        moduleStartMatch = moduleStart_re.search(lines, moduleEndPos)
+        if not moduleStartMatch: break
+        moduleStartPos = moduleStartMatch.end()
+        moduleEndMatch = moduleEnd_re.search(lines, moduleStartPos)
+        moduleEndPos = moduleEndMatch.start()
+
+        # find the submodules
+        instancesMatch = instance_re.findall(lines, moduleStartPos, moduleEndPos)
+
+        # build a list
+        module = [moduleStartMatch.group('module'), instancesMatch]
+        moduleList.append(module)
+
+    return moduleList
+
 
 
 # Search and find Flip Flops
@@ -115,10 +138,10 @@ def searchFlipFlops():
     if _verbose > 0:
         print "Searching for flip flops ..."
     for module in _verilogTokens:
-        moduleName = module[0][1]
+        moduleName = module[0]
         for instance in module[1]:
             instanceType = instance[0]
-            instanceName = instance[1][0][0]
+            instanceName = instance[1]
             UMCmatch = _FFcellsUMC_re.match(instanceType)
 
             # check for FF cells from IBM
@@ -154,7 +177,7 @@ def searchFlipFlops():
 
     # some information output
     if _verbose > 0:
-        print "  found {0} flip flops.".format(len(_FF))
+        print "  found {0} flip flops.\n".format(len(_FF))
     #pprint(_instances, indent=2)
     #pprint(_FF, indent=2)
     #print ""
@@ -191,6 +214,9 @@ def buildInstanceList():
 def saveToOutput():
     global _outFile
     t = Template(file=_templateFile)
+
+    if _verbose > 0:
+        print "Writing output file ..."
 
     # fill the placeholders with meaning
     t.datetime = time.strftime('%x %X %Z')
