@@ -5,9 +5,59 @@ This is my collection of tools I have written, to make my life with radiation pr
 
 Contents:
 
+* [Hamming En-/Decoder](#hamming-encoder)
 * [Hamming Table](#hamming-table)
 * [VHDL Halo Constants](#vhdl-halo-constants)
 * [Flip Flop Finder](#flip-flop-finder)
+
+
+Hamming En-/Decoder and Counter
+-------------------------------
+
+I wanted a generic Hamming encoder/decoder to implement in my digital design because I was annoyed by creating code for Ham(7,4), Ham(17,12), Ham(x,y), and so on. This file contains modules for generic Hamming encoder and decoder, as well as a counter with internal storage Hamming protected. To make it as easy as possible to use a Hamming encoded buffer, there is also a module to create a protected register.
+
+
+### Usage
+
+Add the file to your design and insert the module as usual. An example for Ham(7,4) would be this:
+
+In your architecture header include this:
+
+    component HammingRegister
+      generic (
+        NBits     : integer;
+        NBitsEnc  : integer
+      );
+      port (
+        clk       : in  std_logic;
+        nreset    : in  std_logic;
+        data_in   : in  std_logic_vector(NBits-1 downto 0);
+        data_out  : out std_logic_vector(NBits-1 downto 0);
+        SEU_error : out std_logic
+      );
+    end component;
+
+    signal signal_new     : std_logic_vector(3 downto 0);
+    signal signal         : std_logic_vector(3 downto 0);
+    signal signal_SEU     : std_logic;
+
+
+And then in the architecture itself:
+
+    signal_register : HammingRegister
+    generic map (
+      NBits     => 4,
+      NBitsEnc  => 7
+    )
+    port map (
+      clk       => clk,
+      nreset    => reset,
+      data_in   => signal_new,
+      data_out  => signal,
+      SEU_error => signal_SEU
+    );
+
+Now you just have to assign the next value for the buffer to the `signal_new` signal while the `signal` provides the decoded and corrected signal, which is stored with Hamming encoding internally. If you are interested to know that a single event upset (SEU) happened, you can use the `signal_SEU` signal.
 
 
 Hamming Table
