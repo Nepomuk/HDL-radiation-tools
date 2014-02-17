@@ -26,7 +26,7 @@ def main():
         mask = 1 << pos
         haloValue = realValue ^ mask
         haloValueStr = str(bin(haloValue))[2:].zfill(wordLength)
-        print 'constant {}_{} : state_type := "{}";'.format(constantName, pos, haloValueStr)
+        print 'constant {0}_{1} : state_type := "{2}";'.format(constantName, pos, haloValueStr)
 
 
 if __name__ == '__main__':
