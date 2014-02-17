@@ -5,14 +5,14 @@ This is my collection of tools I have written, to make my life with radiation pr
 
 Contents:
 
-* [Hamming En-/Decoder](#hamming-encoder)
+* [Hamming En-/Decoder](#hamming-register)
 * [Hamming Table](#hamming-table)
 * [VHDL Halo Constants](#vhdl-halo-constants)
 * [Flip Flop Finder](#flip-flop-finder)
 
 
-Hamming En-/Decoder and Counter
--------------------------------
+Hamming Register
+----------------
 
 I wanted a generic Hamming encoder/decoder to implement in my digital design because I was annoyed by creating code for Ham(7,4), Ham(17,12), Ham(x,y), and so on. This file contains modules for generic Hamming encoder and decoder, as well as a counter with internal storage Hamming protected. To make it as easy as possible to use a Hamming encoded buffer, there is also a module to create a protected register.
 
