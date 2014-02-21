@@ -32,6 +32,7 @@ entity HammingRegister is
   port (
     clk       : in  std_logic;
     nreset    : in  std_logic;
+    default   : in  std_logic_vector(NBits-1 downto 0);
     data_in   : in  std_logic_vector(NBits-1 downto 0);
     data_out  : out std_logic_vector(NBits-1 downto 0);
     SEU_error : out std_logic
@@ -63,10 +64,13 @@ architecture HammingRegister_RTL of HammingRegister is
     );
   end component;
 
-  signal register_enc      : std_logic_vector(NBitsEnc-1 downto 0);
-  signal register_ham      : std_logic_vector(NBitsEnc-1 downto 0);
+  signal data           : std_logic_vector(NBits-1 downto 0);
+  signal register_enc   : std_logic_vector(NBitsEnc-1 downto 0);
+  signal register_ham   : std_logic_vector(NBitsEnc-1 downto 0);
 
 begin
+
+  data <= default when nreset = '0' else data_in;
 
   encoder : HammingEncoder
   generic map (
@@ -74,7 +78,7 @@ begin
     NBitsEnc  => NBitsEnc
   )
   port map (
-    data_in   => data_in,
+    data_in   => data,
     data_enc  => register_enc
   );
   decoder : HammingDecoder
@@ -89,7 +93,8 @@ begin
   );
   process (clk, nreset) begin
     if nreset = '0' then
-      register_ham <= (others => '0');
+      -- the default value is put into the encoder in case of an reset
+      register_ham <= register_enc;
     elsif rising_edge(clk) then
       register_ham <= register_enc;
     end if;
