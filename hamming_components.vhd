@@ -12,6 +12,14 @@
 --               All of these modules are generic and need the length of
 --               raw (NBits) and encoded (NBitsEnc) data vectors.
 --
+-- The length of data, a signal with m parity bits can cover. If you have a
+-- signal with x bits data length, search for the row with data length <= x.
+-- Add up the two numbers for encoded (total) data length.
+--     m: 2  data:  1     |   m: 6  data:  57
+--     m: 3  data:  4     |   m: 7  data: 120
+--     m: 4  data: 11     |   m: 8  data: 247
+--     m: 5  data: 26     |   m: 9  data: 502
+--
 --------------------------------------------------------------------------------
 
 
