@@ -226,17 +226,17 @@ This step is optional, but I recommend you to do it. What we will do is basicall
 First you have to locate your standard cell directory and make a local copy of it. A starting point for searching could be the `cds.lib` file for NCLaunch. In there were these lines at my setup:
 
 ```
-DEFINE cmos8rf_lib /usr/ibm_lib/cmos8_relDM/ibm_cmos8rf/std_cell/relDM/verilog/cmos8rf_lib
+DEFINE cmos_lib /usr/tech_lib/cmos/std_cell/verilog/cmos_lib
 DEFINE worklib ./worklib
 ```
 
-The directory you need to copy is then `/usr/ibm_lib/cmos8_relDM/ibm_cmos8rf/std_cell/relDM/verilog/`. After done this, locate your flip flop modules. I went with the basic modules and not with the primitives, because the latter produced some strange effects. For me I had to change the following modules:
+The directory you need to copy is then `/usr/tech_lib/cmos/std_cell/verilog/`. After doing this, locate your flip flop modules. I went with the basic modules and not with the primitives, because the latter produced some strange effects. For me I had to change the following modules:
 
 ```
 DFF.v, DFFR.v, DFFS.v, DFFSR.v, SDFF.v, SDFFR.v, SDFFS.v, SDFFSR.v
 ```
 
-I put my [DFFR.v](https://github.com/Nepomuk/HDL-radiation-tools/blob/master/flipflopfinder/DFFR.v) as an example in this repository and commented, what you have to change. The relevant part is this:
+In these modules you have to add the SEU flag, the relevant part in my case was:
 
 ```verilog
 reg SEU = 1'b0;
@@ -258,8 +258,8 @@ If `SEU` is high, it negates the `qout` signal (which is the output of the flip 
 After you have made all modifications, you need to tell your simulator where to find the modified standard cell library. For me the cds.lib looks now like this:
 
 ```
-#DEFINE cmos8rf_lib /usr/ibm_lib/cmos8_relDM/ibm_cmos8rf/std_cell/relDM/verilog/cmos8rf_lib
-DEFINE cmos8rf_lib ./std_cell_SEU/verilog/cmos8rf_lib
+#DEFINE cmos_lib /usr/tech_lib/cmos/std_cell/verilog/cmos_lib
+DEFINE cmos_lib ./std_cell_SEU/verilog/cmos_lib
 DEFINE worklib ./worklib
 ```
 
