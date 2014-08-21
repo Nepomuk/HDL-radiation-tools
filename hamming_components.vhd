@@ -400,6 +400,10 @@ architecture HammingCounter_RTL of HammingCounter is
   signal hamming_reg  : std_logic_vector(NBitsEnc-1 downto 0);
 
   component HammingEncoder
+    generic (
+      NBits     : integer := 4;
+      NBitsEnc  : integer := 7
+    );
     port (
       data_in   : in  std_logic_vector(NBits-1 downto 0);
       data_enc  : out std_logic_vector(NBitsEnc-1 downto 0)
@@ -407,6 +411,10 @@ architecture HammingCounter_RTL of HammingCounter is
   end component;
 
   component HammingDecoder
+    generic (
+      NBits     : integer := 4;
+      NBitsEnc  : integer := 7
+    );
     port (
       data_enc  : in  std_logic_vector(NBitsEnc-1 downto 0);
       data_out  : out std_logic_vector(NBits-1 downto 0);
@@ -417,12 +425,20 @@ architecture HammingCounter_RTL of HammingCounter is
 begin
 
   input_encoder : HammingEncoder
+  generic map (
+    NBits     => NBits,
+    NBitsEnc  => NBitsEnc
+  )
   port map (
     data_in   => ctr_new,
     data_enc  => ctr_encoded
   );
 
   output_decoder : HammingDecoder
+  generic map (
+    NBits     => NBits,
+    NBitsEnc  => NBitsEnc
+  )
   port map (
     data_enc  => hamming_reg,
     data_out  => ctr_decoded,
@@ -445,5 +461,3 @@ begin
   endofcount <= '1' when all_ones(ctr_decoded) else '0';
 
 end HammingCounter_RTL;
-
-
